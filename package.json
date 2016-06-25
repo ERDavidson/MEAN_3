@@ -1,0 +1,10 @@
+{
+  "name": "MEAN_doctors_appointments",
+  "version": "0.0.1",
+  "dependencies": {
+    "body-parser": "latest",
+    "express": "latest",
+    "mongoose": "latest",
+    "socket.io": "^1.4.6"
+  }
+}

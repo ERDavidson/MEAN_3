@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html ng-app="myApp">
+<head>
+	<title>Doctor's Appointments</title>	
+	<link rel='stylesheet' type='text/css' href='./static/style.css'>
+	<script type="text/javascript" src="./angular.min.js"></script>
+	<script type="text/javascript" src="./angular-route-1_5_5.js"></script>
+	<script>
+		var myApp = angular.module('myApp', ['ngRoute']);
+
+		myApp.config(function($routeProvider){
+			$routeProvider
+				.when('/', {
+					templateUrl: './partials/schedule.html'
+				})
+				.when('/new_appointment', {
+					templateUrl: './partials/new_appointment.html'
+				});
+		});
+
+		myApp.factory("appointmentFactory", ['$http', function($http){
+			var factory = {};
+			factory.index = function(callback){
+				$http.get('/appointments').success(function(result){
+					callback(result);
+				})
+			}
+			factory.create = function(new_appointment, callback){
+				$http.post('/appointments/create', new_appointment).success(function(result){
+					callback(result);
+				})
+			}
+			factory.delete = function(appointment_id, callback){
+				var delete_path = "/appointments/" + appointment_id + "/delete";
+				$http.post(delete_path).success(function(result){
+					callback(result);
+				})
+			}
+			return factory;
+		}]);
+		myApp.factory("userFactory", ['$http', function($http){
+			var factory = {};
+			factory.current_user = "";
+			factory.login = function(user_name, callback){
+				factory.current_user = user_name;
+				callback(factory.current_user);
+			}
+			factory.logout = function(callback){
+				factory.current_user = "";
+				callback(factory.current_user);
+			}
+			return factory;
+		}]);
+
+		myApp.controller("usersController", ["$scope", "$location", "userFactory", function($scope, $location, userFactory){
+			$scope.current_user = "";
+			$scope.login = function(){
+				userFactory.login($scope.user_name, function(result){
+					$scope.current_user = result;
+					$location.url('/');
+				})
+			}
+			$scope.logout = function(){
+				userFactory.logout(function(result){
+					$scope.current_user = result;
+				})
+			}
+		}]);
+		myApp.controller("appointmentsController", ["$scope", '$location', "appointmentFactory", "userFactory", function($scope, $location, appointmentFactory, userFactory){
+			appointmentFactory.index(function(result){
+				$scope.appointment_list = result.appointment_list;
+				for (index in $scope.appointment_list){
+					$scope.appointment_list[index].date = new Date($scope.appointment_list[index].date);
+					$scope.appointment_list[index].time = $scope.appointment_list[index].date;
+					$scope.appointment_list[index].date = $scope.appointment_list[index].date.toLocaleDateString();
+					$scope.appointment_list[index].time = $scope.appointment_list[index].time.toLocaleTimeString();
+				}
+			})
+			$scope.new = function(){
+				$location.url('/new_appointment');
+			}
+			$scope.delete = function(appointment_id){
+				appointmentFactory.delete(appointment_id, function(result){
+					$scope.appointment_list = result.appointment_list;
+				})
+			}
+		}]);
+		myApp.controller("newAppointmentsController", ["$scope", '$location', "appointmentFactory", "userFactory", function($scope, $location, appointmentFactory, userFactory){
+			$scope.current_user = userFactory.current_user;
+			$scope.to_index = function(){
+				$location.url('/');
+			}
+			$scope.create = function(){
+				$scope.errors = [];
+				var new_appointment = {};
+				var appt_datetime = $scope.appt_date + " " + $scope.appt_time;
+				console.log("raw fused datetime: " + appt_datetime);
+				new_appointment.datetime = appt_datetime;
+				new_appointment.complaint = $scope.complaint;
+				new_appointment.patient = $scope.current_user
+				if (new_appointment.complaint.length < 10){
+					$scope.errors.push("Complaint must be at least 10 characters in length.");
+				} else {
+					appointmentFactory.create(new_appointment, function(result){
+						if (result.errors.length > 0){
+							console.log("resulting errors: " + JSON.stringify(result));
+							$scope.errors.push(result.errors);
+						} else {
+							$location.url('/');
+						}
+					})
+				}
+			}
+		}]);
+	</script>
+</head>
+<body id="MEAN_doc_appts" ng-app="myApp">
+	<div ng-controller='usersController'>
+		<div class='login' ng-show='current_user==""'>
+			Please enter the patient's first and last name: <input type='text' ng-model='user_name'>
+			<input type='submit' ng-click='login()' value='Login'>
+		</div>
+		<div class='main' ng-show='current_user!=""'>
+			<input type='submit' ng-click='logout()' value='Logout'>
+			<div ng-view></div>
+		</div>
+	</div>
+
+</body>
+</html>

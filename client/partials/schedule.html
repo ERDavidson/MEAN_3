@@ -1,0 +1,21 @@
+<div ng-controller='appointmentsController'>
+	<h2>Doctor's Appointments</h2>
+	<p>Search Appointments: <input type='text' ng-model='appt_filter'></p>
+	<table>
+		<tr>
+			<th>Date</th>
+			<th>Time</th>
+			<th>Patient</th>
+			<th>Complaint</th>
+			<th>Actions</th>
+		</tr>
+		<tr ng-repeat='appointment in appointment_list | filter:appt_filter | orderBy: "appointment.date"'>
+			<td>{{appointment.date}}</td>
+			<td>{{appointment.time}}</td>
+			<td>{{appointment.patient}}</td>
+			<td>{{appointment.complaint}}</td>
+			<td><input type='submit' ng-show='appointment.patient == current_user' ng-click='delete(appointment._id)' value='Cancel Appointment'></td>
+		</tr>
+	</table>
+	<input type='submit' ng-click='new()' value='Schedule New Appointment'>
+</div>

@@ -1,0 +1,33 @@
+body{
+	background-color: rgb(80,65,55);
+	color: rgb(200,200,200);
+	font-family: "Sans-Serif";
+	font-size: 0.9rem;
+	vertical-align: top;
+}
+table{
+	padding: 8px;
+	border-color: black;
+	border-width: 2px;
+	border-style: solid;
+	display: block;
+	border-collapse: collapse;
+}
+
+td{
+	border-color: black;
+	border-width: 1px;
+	border-style: dotted;
+	padding: 4px;
+	vertical-align: middle;
+}
+
+a{
+	color: rgb(15,12,10);
+}
+
+.error{
+	background-color: rgb(225,100,100);
+	color: rgb(15,12,10);
+	display: inline-block;
+}

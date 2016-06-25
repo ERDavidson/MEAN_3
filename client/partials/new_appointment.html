@@ -1,0 +1,13 @@
+<div ng-controller='newAppointmentsController'>
+<h2>New Appointment</h2>
+<p class="error">{{errors}}</p>
+<form>
+	<p>
+		Date: <input type='text' ng-model='appt_date' placeholder='i.e. 08/15/2016'> 
+		Time: <input type='text' ng-model='appt_time' placeholder='i.e. 3:40 PM'>
+	</p>
+	<p>Patient: <span ng-bind='current_user'></span></p>
+<textarea ng-model='complaint' rows='7' cols='28'></textarea>
+<input type='submit' ng-click='to_index()' value='Cancel'><input type='submit' ng-click='create()' value='Create Appointment'>
+
+</div>
